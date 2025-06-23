@@ -58,7 +58,6 @@ export default function LoginModule() {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    watch,
   } = useForm<LoginFormData>({
     mode: "all",
     defaultValues: {
@@ -67,7 +66,6 @@ export default function LoginModule() {
     },
     resolver: yupResolver(schema),
   });
-  console.log(watch(), errors);
 
   const onSubmit = (data: LoginFormData) => {
     dispatch(loginAdmin(data));
