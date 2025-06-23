@@ -1,45 +1,79 @@
 "use client";
-import api from "@/libs/api";
+
 import { useEffect, useState } from "react";
+import {
+  fetchEmployees,
+  deleteEmployee,
+  Employee,
+} from "@/features/employee/employeeSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import EmployeeForm from "@/components/employee-form";
 
 export default function EmployeePage() {
-  const [employees, setEmployees] = useState([]);
-
-  const fetchData = async () => {
-    const res = await api.get("/employee");
-    setEmployees(res.data);
-  };
+  const dispatch = useAppDispatch();
+  const { data: employees } = useAppSelector((state) => state.employee);
+  const [editing, setEditing] = useState<Employee | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    dispatch(fetchEmployees());
+  }, [dispatch]);
 
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-4">Data Pegawai</h1>
-      <table className="w-full table-auto border">
-        <thead>
+    <div className="max-w-4xl mx-auto mt-10">
+      <div className="flex justify-between mb-4">
+        <h1 className="text-xl font-bold">Data Pegawai</h1>
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded"
+          onClick={() => {
+            setEditing(null);
+            setShowForm(true);
+          }}
+        >
+          Tambah Pegawai
+        </button>
+      </div>
+
+      <table className="w-full border text-sm">
+        <thead className="bg-gray-100">
           <tr>
-            <th>Nama</th>
-            <th>Email</th>
-            <th>Aksi</th>
+            <th className="border p-2">Nama</th>
+            <th className="border p-2">Email</th>
+            <th className="border p-2">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          {employees.map((e: any) => (
-            <tr key={e.id}>
-              <td>
-                {e.firstName} {e.lastName}
+          {employees.map((emp) => (
+            <tr key={emp.id}>
+              <td className="border p-2">
+                {emp.firstName} {emp.lastName}
               </td>
-              <td>{e.email}</td>
-              <td>
-                <button>Edit</button>
-                <button>Hapus</button>
+              <td className="border p-2">{emp.email}</td>
+              <td className="border p-2 space-x-2">
+                <button
+                  className="text-blue-600"
+                  onClick={() => {
+                    setEditing(emp);
+                    setShowForm(true);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="text-red-600"
+                  onClick={() => dispatch(deleteEmployee(emp.id))}
+                >
+                  Hapus
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {showForm && (
+        <EmployeeForm onClose={() => setShowForm(false)} existing={editing} />
+      )}
     </div>
   );
 }
