@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   addEmployee,
   updateEmployee,
@@ -8,6 +8,16 @@ import {
 } from "@/features/employee/employeeSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect } from "react";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {
   onClose: () => void;
@@ -17,12 +27,36 @@ type Props = {
 export default function EmployeeForm({ onClose, existing }: Props) {
   const dispatch = useAppDispatch();
 
+  const schema = yup.object({
+    email: yup
+      .string()
+      .email("invalid email!")
+      .required("Email must be filled!"),
+    firstName: yup.string().required("First Name must be filled!"),
+    lastName: yup.string().required("Last Name must be filled!"),
+    gender: yup.string().required("Gender must be filled!"),
+    phone: yup.string().required("Phone Number must be filled!"),
+    address: yup.string().required("Address must be filled!"),
+  });
+
   const {
+    control,
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<Omit<Employee, "id">>();
+  } = useForm<Omit<Employee, "id">>({
+    mode: "all",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      gender: "",
+      phone: "",
+      address: "",
+    },
+    resolver: yupResolver(schema),
+  });
 
   const onSubmit = (data: Omit<Employee, "id">) => {
     if (existing) {
@@ -33,6 +67,18 @@ export default function EmployeeForm({ onClose, existing }: Props) {
     onClose();
   };
 
+  const handleClose = () => {
+    reset({
+      firstName: "",
+      lastName: "",
+      email: "",
+      gender: "",
+      phone: "",
+      address: "",
+    });
+    onClose();
+  };
+
   useEffect(() => {
     if (existing) {
       reset(existing);
@@ -40,64 +86,97 @@ export default function EmployeeForm({ onClose, existing }: Props) {
   }, [existing, reset]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+    <div className="flex justify-center items-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white p-6 rounded space-y-4 w-full max-w-md"
+        className="bg-white p-4 space-y-4 rounded w-full min-w-lg max-w-lg"
       >
         <h2 className="text-lg font-semibold">
           {existing ? "Edit" : "Tambah"} Pegawai
         </h2>
 
-        <input
-          {...register("firstName", { required: true })}
-          placeholder="Nama Depan"
-          className="border p-2 w-full"
-        />
-        {errors.firstName && (
-          <span className="text-red-500 text-sm">Wajib diisi</span>
-        )}
+        <div className="flex w-full gap-4 flex-col">
+          <div className="grid grid-cols-2 gap-2">
+            <TextField
+              {...register("firstName", { required: true })}
+              placeholder="Nama Depan"
+              label="Nama Depan"
+              fullWidth
+              error={!!errors?.firstName?.message}
+              helperText={errors?.firstName?.message}
+            />
 
-        <input
-          {...register("lastName", { required: true })}
-          placeholder="Nama Belakang"
-          className="border p-2 w-full"
-        />
-        {errors.lastName && (
-          <span className="text-red-500 text-sm">Wajib diisi</span>
-        )}
+            <TextField
+              {...register("lastName", { required: true })}
+              placeholder="Nama Belakang"
+              label="Nama Belakang"
+              fullWidth
+              error={!!errors?.lastName?.message}
+              helperText={errors?.lastName?.message}
+            />
+          </div>
 
-        <input
-          {...register("email", { required: true })}
-          placeholder="Email"
-          className="border p-2 w-full"
-        />
-        {errors.email && (
-          <span className="text-red-500 text-sm">Wajib diisi</span>
-        )}
+          <TextField
+            {...register("email", { required: true })}
+            placeholder="Email"
+            label="Email"
+            fullWidth
+            error={!!errors?.email?.message}
+            helperText={errors?.email?.message}
+          />
 
-        <select
-          {...register("gender", { required: true })}
-          className="border p-2 w-full"
-        >
-          <option value="">Pilih Jenis Kelamin</option>
-          <option value="male">Laki-laki</option>
-          <option value="female">Perempuan</option>
-        </select>
-        {errors.gender && (
-          <span className="text-red-500 text-sm">Wajib diisi</span>
-        )}
+          <TextField
+            {...register("phone", { required: true })}
+            placeholder="Phone Number"
+            label="Phone Number"
+            fullWidth
+            error={!!errors?.phone?.message}
+            helperText={errors?.phone?.message}
+          />
 
-        <div className="flex justify-end space-x-2">
-          <button type="button" onClick={onClose} className="text-gray-500">
+          <FormControl fullWidth error={!!errors.gender}>
+            <InputLabel id="gender-label">Pilih Jenis Kelamin</InputLabel>
+            <Controller
+              name="gender"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId="gender-label"
+                  label="Pilih Jenis Kelamin"
+                >
+                  <MenuItem value="male">Laki-laki</MenuItem>
+                  <MenuItem value="female">Perempuan</MenuItem>
+                </Select>
+              )}
+            />
+            {errors.gender && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.gender.message}
+              </p>
+            )}
+          </FormControl>
+
+          <TextField
+            {...register("address", { required: true })}
+            placeholder="Address"
+            label="Address"
+            fullWidth
+            multiline
+            rows={2}
+            error={!!errors?.address?.message}
+            helperText={errors?.address?.message}
+          />
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="contained" type="button" onClick={handleClose}>
             Batal
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
+          </Button>
+          <Button variant="contained" type="submit">
             Simpan
-          </button>
+          </Button>
         </div>
       </form>
     </div>
