@@ -105,7 +105,7 @@ export default function LoginModule() {
                   message: "Format email tidak valid",
                 },
               })}
-              error={errors?.email?.message !== ""}
+              error={!!errors?.email?.message}
               helperText={errors?.email?.message}
               id="email"
               type="email"
@@ -128,7 +128,7 @@ export default function LoginModule() {
                   message: "Minimal 6 karakter",
                 },
               })}
-              error={errors?.password?.message !== ""}
+              error={!!errors?.password?.message}
               helperText={errors?.password?.message}
               name="password"
               placeholder="••••••"

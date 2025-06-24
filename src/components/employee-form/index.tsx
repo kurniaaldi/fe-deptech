@@ -92,15 +92,15 @@ export default function EmployeeForm({ onClose, existing }: Props) {
         className="bg-white p-4 space-y-4 rounded w-full min-w-lg max-w-lg"
       >
         <h2 className="text-lg font-semibold">
-          {existing ? "Edit" : "Tambah"} Pegawai
+          {existing ? "Edit" : "Create"} Employee
         </h2>
 
         <div className="flex w-full gap-4 flex-col">
           <div className="grid grid-cols-2 gap-2">
             <TextField
               {...register("firstName", { required: true })}
-              placeholder="Nama Depan"
-              label="Nama Depan"
+              placeholder="First Name"
+              label="First Name"
               fullWidth
               error={!!errors?.firstName?.message}
               helperText={errors?.firstName?.message}
@@ -108,8 +108,8 @@ export default function EmployeeForm({ onClose, existing }: Props) {
 
             <TextField
               {...register("lastName", { required: true })}
-              placeholder="Nama Belakang"
-              label="Nama Belakang"
+              placeholder="Last Name"
+              label="Last Name"
               fullWidth
               error={!!errors?.lastName?.message}
               helperText={errors?.lastName?.message}
@@ -146,8 +146,8 @@ export default function EmployeeForm({ onClose, existing }: Props) {
                   labelId="gender-label"
                   label="Pilih Jenis Kelamin"
                 >
-                  <MenuItem value="male">Laki-laki</MenuItem>
-                  <MenuItem value="female">Perempuan</MenuItem>
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
                 </Select>
               )}
             />

@@ -1,42 +1,38 @@
 "use client";
-
-import React from "react";
 import { useEffect, useState } from "react";
-import {
-  fetchEmployees,
-  deleteEmployee,
-  Employee,
-} from "@/features/employee/employeeSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import EmployeeForm from "@/components/employee-form";
+import { fetchLeaves, deleteLeave, Leave } from "@/features/leave/leaveSlice";
+import { fetchEmployees } from "@/features/employee/employeeSlice";
+import LeaveForm from "@/components/leave-form";
 import {
-  TableContainer,
   Paper,
+  TableContainer,
   Table,
-  TableBody,
+  TableHead,
   TableRow,
   TableCell,
-  TableHead,
-  TablePagination,
+  TableBody,
   IconButton,
+  TablePagination,
   Button,
 } from "@mui/material";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import AlertDialogSlide from "@/components/dialog";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
-import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import moment from "moment";
 
-export default function EmployeeModule() {
+export default function LeaveModule() {
   const dispatch = useAppDispatch();
-  const { data: employees, pagination } = useAppSelector(
-    (state) => state.employee,
-  );
-  const [editing, setEditing] = useState<Employee | null>(null);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const { data: leaves, pagination } = useAppSelector((s) => s.leave);
+  //   const employees = useAppSelector((s) => s.employee.data);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Leave | null>(null);
 
   useEffect(() => {
-    dispatch(fetchEmployees({ page: page + 1, limit: rowsPerPage }));
+    dispatch(fetchEmployees({ page: 1, limit: 100 }));
+    dispatch(fetchLeaves({ page: page + 1, limit: rowsPerPage }));
   }, [dispatch, page, rowsPerPage]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -53,16 +49,13 @@ export default function EmployeeModule() {
   return (
     <div className="max-w-4xl mx-auto mt-10">
       <div className="flex justify-between mb-4">
-        <h1 className="text-xl font-bold">Data Pegawai</h1>
+        <h1 className="text-xl font-bold">Data Cuti Pegawai</h1>
         <Button
+          onClick={() => setOpen(true)}
           variant="contained"
           color="success"
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
         >
-          Tambah Pegawai
+          Add Leave
         </Button>
       </div>
 
@@ -71,18 +64,23 @@ export default function EmployeeModule() {
           <Table stickyHeader sx={{ minWidth: 500 }} aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell style={{ minWidth: 170 }}>Name</TableCell>
-                <TableCell style={{ minWidth: 170 }}>Email</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Employee</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Date</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Reason</TableCell>
                 <TableCell style={{ minWidth: 170 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {(employees || []).map((row) => (
+              {(leaves || []).map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
-                    {row.firstName} {row.lastName}
+                    {row?.Employee?.firstName} {row?.Employee?.lastName}
                   </TableCell>
-                  <TableCell>{row.email}</TableCell>
+                  <TableCell>
+                    {moment(row.startDate).format("DD MMM YYYY")} s/d{" "}
+                    {moment(row.endDate).format("DD MMM YYYY")}
+                  </TableCell>
+                  <TableCell>{row.reason}</TableCell>
                   <TableCell style={{ width: 160 }}>
                     <IconButton
                       color="primary"
@@ -95,18 +93,13 @@ export default function EmployeeModule() {
                     </IconButton>
                     <IconButton
                       color="error"
-                      onClick={() => dispatch(deleteEmployee(row.id))}
+                      onClick={() => dispatch(deleteLeave(row.id))}
                     >
                       <DeleteRoundedIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
-              {/* {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )} */}
             </TableBody>
           </Table>
         </TableContainer>
@@ -123,7 +116,7 @@ export default function EmployeeModule() {
 
       {open && (
         <AlertDialogSlide open={open} handleClose={() => setOpen(false)}>
-          <EmployeeForm onClose={() => setOpen(false)} existing={editing} />
+          <LeaveForm existing={editing} onClose={() => setOpen(false)} />
         </AlertDialogSlide>
       )}
     </div>
