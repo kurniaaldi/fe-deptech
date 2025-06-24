@@ -1,6 +1,12 @@
 import api from "@/libs/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+interface Pagination {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  perPage: number;
+}
 export interface Leave {
   id: number;
   reason: string;
@@ -18,17 +24,24 @@ export interface ReportEmployee {
 interface ReportState {
   data: ReportEmployee[];
   loading: boolean;
+  pagination: Pagination;
 }
 
 const initialState: ReportState = {
   data: [],
   loading: false,
+  pagination: {} as Pagination,
 };
 
-export const fetchReport = createAsyncThunk("report/fetch", async () => {
-  const res = await api.get("/report/employees-leave");
-  return res.data;
-});
+export const fetchReport = createAsyncThunk(
+  "report/fetch",
+  async ({ page = 1, limit = 10 }: { page?: number; limit?: number }) => {
+    const res = await api.get(
+      `/report/employees-leave?page=${page}&limit=${limit}`,
+    );
+    return res.data;
+  },
+);
 
 const reportSlice = createSlice({
   name: "report",
@@ -40,7 +53,8 @@ const reportSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchReport.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.data = action.payload.data;
+        state.pagination = action.payload.pagination;
         state.loading = false;
       });
   },
