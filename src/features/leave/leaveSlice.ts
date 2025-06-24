@@ -1,12 +1,18 @@
 import api from "@/libs/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+interface Pagination {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  perPage: number;
+}
 export interface Leave {
   id: number;
   reason: string;
   startDate: string;
   endDate: string;
-  employeeId: number;
+  employeeId: number | string;
   Employee?: {
     firstName: string;
     lastName: string;
@@ -17,12 +23,16 @@ const initialState = {
   data: [] as Leave[],
   loading: false,
   error: null as string | null,
+  pagination: {} as Pagination,
 };
 
-export const fetchLeaves = createAsyncThunk("leave/fetch", async () => {
-  const res = await api.get("/leave");
-  return res.data;
-});
+export const fetchLeaves = createAsyncThunk(
+  "leave/fetch",
+  async ({ page = 1, limit = 10 }: { page?: number; limit?: number }) => {
+    const res = await api.get(`/leave?page=${page}&limit=${limit}`);
+    return res.data;
+  },
+);
 
 export const addLeave = createAsyncThunk(
   "leave/add",
@@ -46,6 +56,14 @@ export const deleteLeave = createAsyncThunk(
   },
 );
 
+export const updateLeave = createAsyncThunk(
+  "leave/update",
+  async ({ id, ...payload }: Leave) => {
+    const res = await api.put(`/leave/${id}`, payload);
+    return res.data;
+  },
+);
+
 const leaveSlice = createSlice({
   name: "leave",
   initialState,
@@ -53,7 +71,8 @@ const leaveSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchLeaves.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.data = action.payload.data;
+        state.pagination = action.payload.pagination;
       })
       .addCase(addLeave.fulfilled, (state, action) => {
         state.data.push(action.payload);
