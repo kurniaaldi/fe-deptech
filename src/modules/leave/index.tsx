@@ -20,6 +20,7 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import AlertDialogSlide from "@/components/dialog";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 export default function LeaveModule() {
   const dispatch = useAppDispatch();
@@ -93,7 +94,21 @@ export default function LeaveModule() {
                     </IconButton>
                     <IconButton
                       color="error"
-                      onClick={() => dispatch(deleteLeave(row.id))}
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Are you sure want delete pemanently?",
+                          icon: "warning",
+                          showCancelButton: true,
+                          cancelButtonColor: "gray",
+                          confirmButtonText: "delete",
+                          cancelButtonText: "cancel",
+                          reverseButtons: true,
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            dispatch(deleteLeave(row.id));
+                          }
+                        });
+                      }}
                     >
                       <DeleteRoundedIcon />
                     </IconButton>

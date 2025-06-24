@@ -24,6 +24,7 @@ import {
 import AlertDialogSlide from "@/components/dialog";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import Swal from "sweetalert2";
 
 export default function EmployeeModule() {
   const dispatch = useAppDispatch();
@@ -95,7 +96,21 @@ export default function EmployeeModule() {
                     </IconButton>
                     <IconButton
                       color="error"
-                      onClick={() => dispatch(deleteEmployee(row.id))}
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Are you sure want delete pemanently?",
+                          icon: "warning",
+                          showCancelButton: true,
+                          cancelButtonColor: "gray",
+                          confirmButtonText: "delete",
+                          cancelButtonText: "cancel",
+                          reverseButtons: true,
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            dispatch(deleteEmployee(row.id));
+                          }
+                        });
+                      }}
                     >
                       <DeleteRoundedIcon />
                     </IconButton>
