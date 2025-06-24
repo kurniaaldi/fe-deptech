@@ -60,7 +60,6 @@ export default function AdminForm({ onClose, existing }: Props) {
     },
     resolver: yupResolver(schema),
   });
-  console.log(existing);
 
   const onSubmit = async (data: FormInput) => {
     if (existing) {

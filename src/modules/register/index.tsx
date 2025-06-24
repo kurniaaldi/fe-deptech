@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm } from "react-hook-form";
-import { loginAdmin } from "@/features/auth/authSlice";
+import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -18,11 +17,22 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { InputAdornment, IconButton } from "@mui/material";
+import {
+  InputAdornment,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import { addAdmin } from "@/features/admin/adminslice";
 
 type LoginFormData = {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  gender: string;
+  birthDate: string;
 };
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -44,7 +54,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-export default function LoginModule() {
+export default function RegisterModule() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { token } = useAppSelector((state) => state.auth);
@@ -54,32 +64,43 @@ export default function LoginModule() {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const schema = yup.object({
-    email: yup
-      .string()
-      .email("invalid email!")
-      .required("Email must be filled!"),
-    password: yup.string().required("Password must be filled!"),
+    email: yup.string().email("Invalid email!").required("Email is required!"),
+    firstName: yup.string().required("First Name is required!"),
+    lastName: yup.string().required("Last Name is required!"),
+    gender: yup.string().required("Gender is required!"),
+    birthDate: yup.string().required("Birthdate is required!"),
+    password: yup.string().required("Password is required!"),
   });
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isDirty },
   } = useForm<LoginFormData>({
     mode: "all",
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
+      gender: "",
+      birthDate: "",
       password: "",
     },
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    dispatch(loginAdmin(data));
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await dispatch(addAdmin(data)).unwrap();
+      router.push("/login");
+    } catch (err) {
+      console.error("Gagal register:", err);
+    }
   };
 
   useEffect(() => {
-    if (token) router.push("/employee");
+    if (token) router.push("/login");
   }, [token, router]);
 
   return (
@@ -90,7 +111,7 @@ export default function LoginModule() {
           variant="h4"
           sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
         >
-          Sign in
+          Sign Up
         </Typography>
         <Box
           component="form"
@@ -102,6 +123,25 @@ export default function LoginModule() {
             gap: 2,
           }}
         >
+          <div className="grid grid-cols-2 gap-2">
+            <TextField
+              {...register("firstName")}
+              placeholder="First Name"
+              label="First Name"
+              fullWidth
+              error={!!errors?.firstName?.message}
+              helperText={errors?.firstName?.message}
+            />
+
+            <TextField
+              {...register("lastName")}
+              placeholder="Last Name"
+              label="Last Name"
+              fullWidth
+              error={!!errors?.lastName?.message}
+              helperText={errors?.lastName?.message}
+            />
+          </div>
           <FormControl>
             <FormLabel htmlFor="email">Email</FormLabel>
             <TextField
@@ -167,20 +207,47 @@ export default function LoginModule() {
               variant="outlined"
             />
           </FormControl>
+          <TextField
+            {...register("birthDate")}
+            placeholder="Birthdate"
+            label="Birthdate"
+            type="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            error={!!errors?.birthDate?.message}
+            helperText={errors?.birthDate?.message}
+          />
+          <FormControl fullWidth error={!!errors.gender}>
+            <InputLabel id="gender-label">Pilih Jenis Kelamin</InputLabel>
+            <Controller
+              name="gender"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId="gender-label"
+                  label="Pilih Jenis Kelamin"
+                >
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                </Select>
+              )}
+            />
+            {errors.gender && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.gender.message}
+              </p>
+            )}
+          </FormControl>
+
           <Button
             disabled={!isDirty}
             onClick={handleSubmit(onSubmit)}
             fullWidth
             variant="contained"
           >
-            Sign in
-          </Button>
-          <Button
-            onClick={() => router.push("/register")}
-            fullWidth
-            variant="contained"
-          >
-            Sign up
+            Sign Up
           </Button>
         </Box>
       </Card>
