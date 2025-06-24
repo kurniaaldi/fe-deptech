@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { logout as dispatchLogout } from "@/features/auth/authSlice";
 
-const pages = ["employee", "leave", "report"];
+const pages = ["employee", "leave", "report", "admin"];
 const settings = ["profile", "logout"];
 
 function ResponsiveAppBar() {
