@@ -4,10 +4,12 @@ import employeeReducer from "@/features/employee/employeeSlice";
 import leaveReducer from "@/features/leave/leaveSlice";
 import profileReducer from "@/features/profile/profileSlice";
 import reportReducer from "@/features/report/reportSlice";
+import adminReducer from "@/features/admin/adminslice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    admin: adminReducer,
     employee: employeeReducer,
     leave: leaveReducer,
     profile: profileReducer,
