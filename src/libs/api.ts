@@ -29,7 +29,8 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 400:
           console.error("Bad Request");
-          toast.error("Bad Request");
+
+          toast.error(error.response?.data?.message || "Bad Request");
 
           break;
         case 401:
@@ -38,21 +39,21 @@ api.interceptors.response.use(
           cookieKeys.forEach((key) => {
             Cookies.remove(key);
           });
-          toast.error("Unauthorized");
+          toast.error(error.response?.data?.message || "Unauthorized");
           console.error("Unauthorized");
           break;
         case 403:
-          toast.error("Forbidden");
+          toast.error(error.response?.data?.message || "Forbidden");
 
           console.error("Forbidden");
           break;
         case 404:
-          toast.error("Not Found");
+          toast.error(error.response?.data?.message || "Not Found");
 
           console.error("Not Found");
           break;
         case 500:
-          toast.error("Internal Server Error");
+          toast.error(error.response?.data?.message || "Internal Server Error");
           console.error("Internal Server Error");
           break;
         default:

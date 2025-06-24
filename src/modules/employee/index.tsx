@@ -52,7 +52,7 @@ export default function EmployeeModule() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10">
+    <div className="max-w-7xl mx-auto mt-10">
       <div className="flex justify-between mb-4">
         <h1 className="text-xl font-bold">Data Pegawai</h1>
         <Button
@@ -74,6 +74,9 @@ export default function EmployeeModule() {
               <TableRow>
                 <TableCell style={{ minWidth: 170 }}>Name</TableCell>
                 <TableCell style={{ minWidth: 170 }}>Email</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Phone</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Address</TableCell>
+                <TableCell style={{ minWidth: 170 }}>Gender</TableCell>
                 <TableCell style={{ minWidth: 170 }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -84,6 +87,9 @@ export default function EmployeeModule() {
                     {row.firstName} {row.lastName}
                   </TableCell>
                   <TableCell>{row.email}</TableCell>
+                  <TableCell>{row.phone}</TableCell>
+                  <TableCell>{row.address}</TableCell>
+                  <TableCell>{row.gender}</TableCell>
                   <TableCell style={{ width: 160 }}>
                     <IconButton
                       color="primary"
